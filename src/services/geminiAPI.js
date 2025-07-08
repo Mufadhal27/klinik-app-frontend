@@ -4,7 +4,6 @@ const backendBaseUrl = import.meta.env.VITE_APP_BACKEND_URL;
 
 export const sendMessageToGemini = async (prompt) => {
   try {
-    // Menggunakan URL dasar dan menambahkan jalur spesifik untuk endpoint chat
     const response = await axios.post(`${backendBaseUrl}/api/chats/ask`, { prompt });
     return response.data.response; 
   } catch (error) {

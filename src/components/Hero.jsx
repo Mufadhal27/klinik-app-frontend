@@ -13,8 +13,6 @@ function Hero() {
           <p className="text-lg text-gray-100">
              Klinik terpercaya dengan pelayanan cepat, nyaman, dan penuh kepedulian.
           </p>
-
-          {/* <Button title="See Services" /> */}
         </div>
       </div>
     </div>

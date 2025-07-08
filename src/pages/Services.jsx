@@ -1,10 +1,7 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
-import ServiceCard from "../components/ServiceCard"; // Pastikan path ini benar
+import ServiceCard from "../components/ServiceCard"; 
 
-// Mengambil URL backend dasar dari environment variable Vite.
-// Variabel ini harus didefinisikan di frontend/.env Anda (untuk lokal)
-// dan di Environment Variables Vercel untuk proyek frontend Anda (untuk deployment).
 const backendBaseUrl = import.meta.env.VITE_APP_BACKEND_URL;
 
 function Services() {
@@ -16,28 +13,23 @@ function Services() {
     const fetchServices = async () => {
       try {
         setIsLoading(true);
-        setError(null); // Reset error
+        setError(null); 
 
-        // --- DEBUGGING: Tambahkan console.log ini ---
         console.log("DEBUG: backendBaseUrl yang digunakan:", backendBaseUrl);
         console.log("DEBUG: URL lengkap untuk /services:", `${backendBaseUrl}/services`);
-        // ---------------------------------------------
 
-        // PERBAIKAN DI SINI: Gunakan backendBaseUrl untuk endpoint services
         const response = await axios.get(`${backendBaseUrl}/services`);
 
-        // ✅ PERBAIKAN: Pastikan response.data adalah array sebelum menyetel state
         if (Array.isArray(response.data)) {
           setServices(response.data);
         } else {
           console.warn("Backend /services tidak mengembalikan array. Data diterima:", response.data);
-          setServices([]); // Set ke array kosong untuk mencegah error .map
+          setServices([]); 
           setError("Data layanan tidak dalam format yang diharapkan dari server.");
         }
 
       } catch (err) {
         console.error("❌ Gagal mengambil layanan:", err);
-        // Penanganan error yang lebih informatif
         if (err.response) {
           setError(`Gagal mengambil layanan: ${err.response.data.error || err.response.statusText}`);
         } else if (err.request) {
@@ -51,7 +43,7 @@ function Services() {
     };
 
     fetchServices();
-  }, []); // [] berarti efek hanya berjalan sekali setelah render awal
+  }, []); 
 
   if (isLoading) {
     return (
