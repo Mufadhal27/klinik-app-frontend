@@ -1,89 +1,82 @@
-import React, { useEffect, useState } from "react";
-import axios from "axios";
-import ServiceCard from "../components/ServiceCard"; 
+import React, { useState } from "react";
+import { sendMessageToGemini } from "../services/geminiAPI";
 
-const backendBaseUrl = import.meta.env.VITE_APP_BACKEND_URL;
+function Chatbot() {
+  const [chat, setChat] = useState([]);
+  const [input, setInput] = useState("");
+  const [loading, setLoading] = useState(false);
 
-function Services() {
-  const [services, setServices] = useState([]);
-  const [isLoading, setIsLoading] = useState(true);
-  const [error, setError] = useState(null);
+  const handleSend = async () => {
+    if (!input.trim()) return;
 
-  useEffect(() => {
-    const fetchServices = async () => {
-      try {
-        setIsLoading(true);
-        setError(null); 
+    const newUserMsg = { from: "user", text: input };
+    setChat((prev) => [...prev, newUserMsg]);
+    setInput("");
+    setLoading(true);
 
-        console.log("DEBUG: backendBaseUrl yang digunakan:", backendBaseUrl);
-        console.log("DEBUG: URL lengkap untuk /services:", `${backendBaseUrl}/services`);
-
-        const response = await axios.get(`${backendBaseUrl}/services`);
-
-        if (Array.isArray(response.data)) {
-          setServices(response.data);
-        } else {
-          console.warn("Backend /services tidak mengembalikan array. Data diterima:", response.data);
-          setServices([]); 
-          setError("Data layanan tidak dalam format yang diharapkan dari server.");
-        }
-
-      } catch (err) {
-        console.error("❌ Gagal mengambil layanan:", err);
-        if (err.response) {
-          setError(`Gagal mengambil layanan: ${err.response.data.error || err.response.statusText}`);
-        } else if (err.request) {
-          setError("Tidak ada respons dari server. Periksa koneksi atau URL backend.");
-        } else {
-          setError("Terjadi kesalahan saat menyiapkan permintaan layanan.");
-        }
-      } finally {
-        setIsLoading(false);
-      }
-    };
-
-    fetchServices();
-  }, []); 
-
-  if (isLoading) {
-    return (
-      <section className="min-h-screen px-6 md:px-20 py-24 bg-slate-50 flex justify-center items-center">
-        <p className="text-xl text-gray-700">Memuat layanan...</p>
-      </section>
-    );
-  }
-
-  if (error) {
-    return (
-      <section className="min-h-screen px-6 md:px-20 py-24 bg-slate-50 flex justify-center items-center">
-        <p className="text-xl text-red-600">Error: {error}</p>
-      </section>
-    );
-  }
+    try {
+      const botReply = await sendMessageToGemini(input);
+      setChat((prev) => [...prev, { from: "bot", text: botReply }]);
+    } catch (err) {
+      console.error("❌ Error:", err);
+      const errorMessage = err.message || "Gagal mendapatkan jawaban dari server.";
+      setChat((prev) => [...prev, { from: "bot", text: `❌ ${errorMessage}` }]);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   return (
     <section className="min-h-screen px-6 md:px-20 py-24 bg-slate-50">
-      <h2 className="text-5xl font-extrabold text-center text-emerald-800 mb-12">
-        Layanan Kami
-      </h2>
-      <p className="text-center text-gray-600 mb-12 max-w-3xl mx-auto leading-relaxed">
-        Kami menyediakan berbagai layanan medis profesional untuk memenuhi kebutuhan kesehatan Anda.
-        Pilih layanan yang Anda butuhkan dan jadwalkan janji temu dengan mudah.
-      </p>
+      <div className="max-w-4xl mx-auto">
+        <h1 className="text-3xl font-bold text-emerald-700 mb-6 text-center">Tanya Sehat</h1>
+        <p className="text-center text-gray-600 mb-10">
+          Tanyakan keluhan kesehatan Anda, dan dapatkan jawaban langsung dari AI Medisia.
+        </p>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 max-w-6xl mx-auto">
-        {services.length > 0 ? (
-          services.map((service) => (
-            <ServiceCard key={service._id} service={service} />
-          ))
-        ) : (
-          <p className="col-span-full text-center text-gray-700 text-lg">
-            Tidak ada layanan yang tersedia saat ini.
-          </p>
-        )}
+        <div className="space-y-4 bg-white rounded-xl p-6 shadow">
+          {chat.map((msg, i) => (
+            <div key={i} className={`flex ${msg.from === "user" ? "justify-end" : "justify-start"}`}>
+              <div
+                className={`max-w-xs px-4 py-2 rounded-xl text-sm whitespace-pre-line ${
+                  msg.from === "user"
+                    ? "bg-emerald-100 text-emerald-800"
+                    : "bg-gray-100 text-gray-700"
+                }`}
+              >
+                {msg.from === "bot" ? (
+                  <div dangerouslySetInnerHTML={{ __html: msg.text }} />
+                ) : (
+                  msg.text
+                )}
+              </div>
+            </div>
+          ))}
+
+          {loading && <div className="text-gray-500 text-sm italic">Mengetik...</div>}
+        </div>
+
+        <div className="flex mt-6 gap-2">
+          <input
+            type="text"
+            value={input}
+            onChange={(e) => setInput(e.target.value)}
+            onKeyDown={(e) => e.key === "Enter" && handleSend()}
+            placeholder="Ketik keluhan kesehatan Anda..."
+            className="flex-1 px-4 py-2 border rounded-full focus:outline-none focus:ring-2 focus:ring-emerald-500"
+            disabled={loading}
+          />
+          <button
+            onClick={handleSend}
+            className="px-5 py-2 bg-emerald-600 text-white rounded-full hover:bg-emerald-700 transition disabled:opacity-50"
+            disabled={loading}
+          >
+            Kirim
+          </button>
+        </div>
       </div>
     </section>
   );
 }
 
-export default Services;
+export default Chatbot;

@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { sendMessageToGemini } from "../services/geminiAPI"; 
+import { sendMessageToGemini } from "../services/geminiAPI";
 
 function Chatbot() {
   const [chat, setChat] = useState([]);
@@ -18,10 +18,8 @@ function Chatbot() {
       const botReply = await sendMessageToGemini(input);
       setChat((prev) => [...prev, { from: "bot", text: botReply }]);
     } catch (err) {
-      console.error("❌ Error di frontend saat panggil backend:", err);
-      const errorMessage = err.response && err.response.data && err.response.data.error
-                           ? err.response.data.error
-                           : err.message || "Gagal mendapatkan jawaban dari server.";
+      console.error("❌ Error:", err);
+      const errorMessage = err.message || "Gagal mendapatkan jawaban dari server.";
       setChat((prev) => [...prev, { from: "bot", text: `❌ ${errorMessage}` }]);
     } finally {
       setLoading(false);
@@ -66,12 +64,12 @@ function Chatbot() {
             onKeyDown={(e) => e.key === "Enter" && handleSend()}
             placeholder="Ketik keluhan kesehatan Anda..."
             className="flex-1 px-4 py-2 border rounded-full focus:outline-none focus:ring-2 focus:ring-emerald-500"
-            disabled={loading} 
+            disabled={loading}
           />
           <button
             onClick={handleSend}
             className="px-5 py-2 bg-emerald-600 text-white rounded-full hover:bg-emerald-700 transition disabled:opacity-50"
-            disabled={loading} 
+            disabled={loading}
           >
             Kirim
           </button>

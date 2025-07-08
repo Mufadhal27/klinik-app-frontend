@@ -40,7 +40,6 @@ function BookingForm() {
       });
     } catch (error) {
       console.error("❌ Gagal kirim booking:", error);
-      // Penanganan error yang lebih informatif
       if (error.response) {
         setErrorMessage(`Terjadi kesalahan: ${error.response.data.error || error.response.statusText}`);
       } else if (error.request) {
@@ -54,14 +53,12 @@ function BookingForm() {
 
   return (
     <form onSubmit={handleSubmit} className="space-y-6">
-      {/* Pesan Berhasil */}
       {successMessage && (
         <div className="bg-green-100 border border-green-300 text-green-800 px-4 py-3 rounded shadow-sm">
           {successMessage}
         </div>
       )}
 
-      {/* Pesan Error */}
       {errorMessage && (
         <div className="bg-red-100 border border-red-300 text-red-800 px-4 py-3 rounded shadow-sm">
           {errorMessage}

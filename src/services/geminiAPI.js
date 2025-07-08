@@ -5,7 +5,7 @@ const backendBaseUrl = import.meta.env.VITE_APP_BACKEND_URL;
 export const sendMessageToGemini = async (prompt) => {
   try {
     const response = await axios.post(`${backendBaseUrl}/api/chats/ask`, { prompt });
-    return response.data.response; 
+    return response.data.response;
   } catch (error) {
     console.error("❌ Error di frontend saat panggil backend:", error);
     if (error.response) {
