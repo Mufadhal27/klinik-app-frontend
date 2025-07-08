@@ -1,6 +1,5 @@
 import React, { useState } from "react";
-// ✅ PERBAIKAN: Impor fungsi sendMessageToGemini dari file layanan
-import { sendMessageToGemini } from "../services/geminiAPI";
+import { sendMessageToGemini } from "../services/geminiAPI"; // Pastikan path ini benar
 
 function Chatbot() {
   const [chat, setChat] = useState([]);
@@ -16,15 +15,14 @@ function Chatbot() {
     setLoading(true);
 
     try {
-      // ✅ PERBAIKAN: Panggil fungsi sendMessageToGemini dari service
-      // ✅ PERBAIKAN: sendMessageToGemini sudah menangani URL dan kunci 'prompt'
       const botReply = await sendMessageToGemini(input);
-
       setChat((prev) => [...prev, { from: "bot", text: botReply }]);
     } catch (err) {
-      console.error("❌ Error:", err);
-      // Menampilkan pesan error yang lebih informatif dari service
-      setChat((prev) => [...prev, { from: "bot", text: `❌ ${err.message || "Gagal mendapatkan jawaban dari server."}` }]);
+      console.error("❌ Error di frontend saat panggil backend:", err);
+      const errorMessage = err.response && err.response.data && err.response.data.error
+                           ? err.response.data.error
+                           : err.message || "Gagal mendapatkan jawaban dari server.";
+      setChat((prev) => [...prev, { from: "bot", text: `❌ ${errorMessage}` }]);
     } finally {
       setLoading(false);
     }
