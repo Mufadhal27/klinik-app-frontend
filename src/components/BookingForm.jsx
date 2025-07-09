@@ -1,8 +1,6 @@
 import { useEffect, useState } from "react";
 import { useLocation } from "react-router-dom";
-import axios from "axios";
-
-const backendBaseUrl = import.meta.env.VITE_APP_BACKEND_URL;
+import { createBooking } from "../utils/bookingAPI";
 
 function BookingForm() {
   const location = useLocation();
@@ -28,7 +26,7 @@ function BookingForm() {
     e.preventDefault();
 
     try {
-      await axios.post(`${backendBaseUrl}/bookings`, formData);
+      await createBooking(formData);
       setSuccessMessage("✅ Booking berhasil dikirim!");
       setErrorMessage("");
       setFormData({

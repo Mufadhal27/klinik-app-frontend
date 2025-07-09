@@ -1,8 +1,6 @@
 import React, { useEffect, useState } from "react";
-import axios from "axios";
+import { getAllServices } from "../utils/serviceAPI";
 import ServiceCard from "../components/ServiceCard";
-
-const backendBaseUrl = import.meta.env.VITE_APP_BACKEND_URL;
 
 function Services() {
   const [services, setServices] = useState([]);
@@ -15,27 +13,24 @@ function Services() {
         setIsLoading(true);
         setError(null);
 
-        console.log("DEBUG: backendBaseUrl yang digunakan:", backendBaseUrl);
-        console.log("DEBUG: URL lengkap untuk /services:", `${backendBaseUrl}/services`);
+        const data = await getAllServices();
+        console.log("DEBUG: Data dari API:", data);
 
-        const response = await axios.get(`${backendBaseUrl}/services`);
-
-        if (Array.isArray(response.data)) {
-          setServices(response.data);
+        if (Array.isArray(data)) {
+          setServices(data);
         } else {
-          console.warn("Backend /services tidak mengembalikan array. Data diterima:", response.data);
-          setServices([]);
-          setError("Data layanan tidak dalam format yang diharapkan dari server.");
+          console.warn("❗ Data layanan bukan array:", data);
+          setError("Format data layanan tidak sesuai.");
         }
 
       } catch (err) {
         console.error("❌ Gagal mengambil layanan:", err);
         if (err.response) {
-          setError(`Gagal mengambil layanan: ${err.response.data.error || err.response.statusText}`);
+          setError(`Gagal ambil layanan: ${err.response.data.error || err.response.statusText}`);
         } else if (err.request) {
-          setError("Tidak ada respons dari server. Periksa koneksi atau URL backend.");
+          setError("❌ Tidak ada respons dari server. Periksa URL backend.");
         } else {
-          setError("Terjadi kesalahan saat menyiapkan permintaan layanan.");
+          setError("❌ Terjadi kesalahan internal.");
         }
       } finally {
         setIsLoading(false);

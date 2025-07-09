@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { sendMessageToGemini } from "../services/geminiAPI";
+import { sendMessageToGemini } from "../utils/geminiAPI";
 
 function Chatbot() {
   const [chat, setChat] = useState([]);
