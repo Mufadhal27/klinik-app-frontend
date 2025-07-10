@@ -99,7 +99,7 @@ function Navbar() {
               </button>
 
               {isDropdownOpen && (
-                <div className="absolute right-0 md:top-full mt-2 md:mt-0 w-48 bg-white rounded-lg shadow-xl p-2 z-20">
+                <div className="absolute right-0 md:top-full mt-2 md:mt-0 w-48 bg-emerald-800 rounded-lg shadow-xl p-2 z-20">
                     <p className="text-gray-800 text-sm font-medium px-2 py-1 mb-2">
                         {currentUser?.username || 'User'}
                     </p>
