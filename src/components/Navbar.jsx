@@ -1,12 +1,19 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { useAuth } from '../contexts/AuthContext';
 
 function Navbar() {
   const [active, setActive] = useState(false);
   const navigate = useNavigate();
+  const { isLoggedIn, currentUser, logout } = useAuth();
 
   const handleNavigate = (path) => {
     navigate(path);
+    setActive(false);
+  };
+
+  const handleLogout = () => {
+    logout();
     setActive(false);
   };
 
@@ -14,7 +21,6 @@ function Navbar() {
     <div className="bg-emerald-800 text-white fixed top-0 left-0 w-full z-50 shadow-md">
       <div className="navbar container mx-auto px-4 py-5 flex items-center justify-between relative">
         
-        {/* Logo */}
         <div className="logo">
           <h1
             className="text-2xl font-bold flex items-center gap-2 cursor-pointer"
@@ -25,7 +31,6 @@ function Navbar() {
           </h1>
         </div>
 
-        {/* Hamburger Button */}
         <button
           className="md:hidden flex flex-col justify-center items-center w-10 h-10 z-20"
           onClick={() => setActive(!active)}
@@ -36,7 +41,6 @@ function Navbar() {
           <span className={`block h-1 w-8 bg-white rounded transition-all duration-300 ${active ? "-rotate-45 -translate-y-2" : ""}`}></span>
         </button>
 
-        {/* Menu */}
         <ul
           className={`menu flex items-center gap-8 md:static fixed left-1/2 -translate-x-1/2 md:-translate-x-0 top-20 md:top-0 bg-emerald-700 md:bg-transparent w-full md:w-auto py-10 md:py-0 flex-col md:flex-row transition-all duration-300 z-10
           ${active ? "opacity-100 pointer-events-auto" : "opacity-0 pointer-events-none"} md:opacity-100 md:pointer-events-auto`}
@@ -56,6 +60,37 @@ function Navbar() {
               </button>
             </li>
           ))}
+
+          {isLoggedIn ? (
+            <li className="flex items-center gap-4 flex-col md:flex-row mt-4 md:mt-0">
+              <span className="text-lg font-semibold text-white">Halo, {currentUser?.username || 'User'}!</span>
+              <button
+                onClick={handleLogout}
+                className="bg-red-500 hover:bg-red-600 text-white font-semibold py-2 px-4 rounded-lg shadow-md hover:shadow-lg transition duration-300 ease-in-out focus:outline-none focus:ring-2 focus:ring-red-400 focus:ring-opacity-75 w-full md:w-auto"
+              >
+                Logout
+              </button>
+            </li>
+          ) : (
+            <>
+              <li className="w-full md:w-auto mt-4 md:mt-0">
+                <button
+                  onClick={() => handleNavigate("/login")}
+                  className="bg-emerald-500 hover:bg-emerald-600 text-white font-semibold py-2 px-4 rounded-lg shadow-md hover:shadow-lg transition duration-300 ease-in-out focus:outline-none focus:ring-2 focus:ring-emerald-400 focus:ring-opacity-75 w-full md:w-auto"
+                >
+                  Login
+                </button>
+              </li>
+              <li className="w-full md:w-auto mt-2 md:mt-0">
+                <button
+                  onClick={() => handleNavigate("/register")}
+                  className="bg-blue-500 hover:bg-blue-600 text-white font-semibold py-2 px-4 rounded-lg shadow-md hover:shadow-lg transition duration-300 ease-in-out focus:outline-none focus:ring-2 focus:ring-blue-400 focus:ring-opacity-75 w-full md:w-auto"
+                >
+                  Register
+                </button>
+              </li>
+            </>
+          )}
         </ul>
       </div>
     </div>

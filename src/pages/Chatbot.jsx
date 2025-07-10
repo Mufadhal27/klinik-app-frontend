@@ -56,24 +56,26 @@ function Chatbot() {
           {loading && <div className="text-gray-500 text-sm italic">Mengetik...</div>}
         </div>
 
-        <div className="flex mt-6 gap-2">
+        {/* --- Bagian yang diubah untuk responsivitas --- */}
+        <div className="flex flex-col sm:flex-row mt-6 gap-2"> {/* Tambahkan flex-col sm:flex-row */}
           <input
             type="text"
             value={input}
             onChange={(e) => setInput(e.target.value)}
             onKeyDown={(e) => e.key === "Enter" && handleSend()}
             placeholder="Ketik keluhan kesehatan Anda..."
-            className="flex-1 px-4 py-2 border rounded-full focus:outline-none focus:ring-2 focus:ring-emerald-500"
+            className="flex-1 px-4 py-2 border rounded-full focus:outline-none focus:ring-2 focus:ring-emerald-500 w-full" /* Tambahkan w-full */
             disabled={loading}
           />
           <button
             onClick={handleSend}
-            className="px-5 py-2 bg-emerald-600 text-white rounded-full hover:bg-emerald-700 transition disabled:opacity-50"
+            className="px-5 py-2 bg-emerald-600 text-white rounded-full hover:bg-emerald-700 transition disabled:opacity-50 flex-shrink-0" /* Tambahkan flex-shrink-0 */
             disabled={loading}
           >
             Kirim
           </button>
         </div>
+
       </div>
     </section>
   );
