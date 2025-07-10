@@ -103,11 +103,7 @@ function Navbar() {
 
               {isDropdownOpen && (
                 // Dropdown container styling sesuai gambar "Lainnya"
-                <div className="absolute right-0 top-full mt-2 w-48 bg-white rounded-lg shadow-xl p-2 z-20">
-                  <p className="text-gray-800 text-sm font-medium px-2 py-1 mb-2">
-                    {currentUser?.username || 'User'}
-                  </p>
-                  {/* Tombol Logout dengan gaya Login/Register, warna merah, dan lebar penuh */}
+                <div className="absolute right-0 top-full mt-2 w-48 bg-emerald-800 rounded-lg shadow-xl p-2 z-20">
                   <button
                     onClick={handleLogoutClick}
                     className="bg-red-500 hover:bg-red-600 text-white font-semibold py-2 px-4 rounded-lg shadow-md hover:shadow-lg transition duration-300 ease-in-out focus:outline-none focus:ring-2 focus:ring-red-400 focus:ring-opacity-75 w-full text-center"
@@ -149,7 +145,7 @@ function Navbar() {
                   Halo, {currentUser?.username || 'User'}!
                 </span>
               </li>
-              <li className="md:hidden w-full mt-2">
+              <li className="md:hidden mt-2">
                 <button
                   onClick={handleLogoutClick}
                   className="bg-red-500 hover:bg-red-600 text-white font-semibold py-2 px-4 rounded-lg shadow-md hover:shadow-lg transition duration-300 ease-in-out focus:outline-none focus:ring-2 focus:ring-red-400 focus:ring-opacity-75 w-full text-center"
