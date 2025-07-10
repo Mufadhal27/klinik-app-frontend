@@ -1,7 +1,7 @@
 import React, { createContext, useState, useContext, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import apiClient from '../utils/axiosConfig';
-import { jwtDecode } from 'jwt-decode'; // Instal: npm install jwt-decode
+import { jwtDecode } from 'jwt-decode';
 
 const AuthContext = createContext(null);
 
@@ -77,7 +77,7 @@ export const AuthProvider = ({ children }) => {
         setIsLoggedIn(false);
         setCurrentUser(null);
         delete apiClient.defaults.headers.common['Authorization'];
-        navigate('/login');
+        navigate('/'); // Mengarahkan ke halaman utama setelah logout
     };
 
     const authValue = {
