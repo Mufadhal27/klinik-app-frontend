@@ -1,15 +1,27 @@
-import React, { useState, useEffect, useRef } from 'react';
-import { Link } from 'react-router-dom';
-import { useAuth } from '../contexts/AuthContext'; 
+import { useState, useEffect, useRef } from "react";
+import { useNavigate } from "react-router-dom";
+import { useAuth } from '../contexts/AuthContext'; // Pastikan path ini benar
 
 function Navbar() {
-  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
-  const dropdownRef = useRef(null);
+  const [active, setActive] = useState(false); // Untuk mobile menu
+  const [isDropdownOpen, setIsDropdownOpen] = useState(false); // Untuk dropdown username
+  const navigate = useNavigate();
+  const dropdownRef = useRef(null); // Ref untuk menutup dropdown saat klik di luar
 
-  // Menggunakan AuthContext untuk mendapatkan status login dan data user
   const { isLoggedIn, currentUser, logout, loading } = useAuth();
 
-  // Efek untuk menutup dropdown saat klik di luar area dropdown
+  const handleNavigate = (path) => {
+    navigate(path);
+    setActive(false); // Tutup mobile menu saat navigasi
+  };
+
+  const handleLogoutClick = () => { // Ganti nama agar tidak konflik dengan fungsi logout dari context
+    logout(); // Panggil fungsi logout dari AuthContext
+    setActive(false); // Tutup mobile menu
+    setIsDropdownOpen(false); // Tutup dropdown
+  };
+
+  // Efek untuk menutup dropdown (username) saat klik di luar
   useEffect(() => {
     function handleClickOutside(event) {
       if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
@@ -22,41 +34,63 @@ function Navbar() {
     };
   }, [dropdownRef]);
 
-  // Fungsi yang dipanggil saat tombol Logout diklik
-  const handleLogoutClick = () => {
-    logout(); // Panggil fungsi logout dari AuthContext
-    setIsDropdownOpen(false); // Tutup dropdown setelah logout
-  };
-
   // Tampilkan null atau loading indicator jika AuthContext sedang memuat
   if (loading) {
-    return null; 
+    return null;
   }
 
   return (
-    <nav className="fixed w-full top-0 left-0 bg-white shadow-md z-50">
-      <div className="container mx-auto px-4 md:px-8 py-4 flex justify-between items-center">
-        {/* Logo atau Nama Aplikasi - Tidak Berubah */}
-        <Link to="/" className="text-2xl font-bold text-emerald-600">
-          Medisia
-        </Link>
+    <div className="bg-emerald-800 text-white fixed top-0 left-0 w-full z-50 shadow-md">
+      <div className="navbar container mx-auto px-4 py-5 flex items-center justify-between relative">
+        <div className="logo">
+          <h1
+            className="text-2xl font-bold flex items-center gap-2 cursor-pointer"
+            onClick={() => handleNavigate("/")}
+          >
+            <img src="/logo.png" alt="logo" className="w-9 h-9 object-contain" />
+            Medisia.
+          </h1>
+        </div>
 
-        <div className="hidden md:flex space-x-6 items-center">
-          <Link to="/" className="text-gray-700 hover:text-emerald-600 transition">Beranda</Link>
-          <Link to="/services" className="text-gray-700 hover:text-emerald-600 transition">Layanan</Link>
-          <Link to="/booking" className="text-gray-700 hover:text-emerald-600 transition">Booking</Link>
-          <Link to="/chatbot" className="text-gray-700 hover:text-emerald-600 transition">Tanya Sehat</Link>
+        <button
+          className="md:hidden flex flex-col justify-center items-center w-10 h-10 z-20"
+          onClick={() => setActive(!active)}
+          aria-label="Toggle menu"
+        >
+          <span className={`block h-1 w-8 bg-white mb-1 rounded transition-all duration-300 ${active ? "rotate-45 translate-y-2" : ""}`}></span>
+          <span className={`block h-1 w-8 bg-white mb-1 rounded transition-all duration-300 ${active ? "opacity-0" : ""}`}></span>
+          <span className={`block h-1 w-8 bg-white rounded transition-all duration-300 ${active ? "-rotate-45 -translate-y-2" : ""}`}></span>
+        </button>
 
-          
-          {isLoggedIn && currentUser ? (
-            <div className="relative" ref={dropdownRef}>
+        <ul
+          className={`menu flex items-center gap-8 md:static fixed left-1/2 -translate-x-1/2 md:-translate-x-0 top-20 md:top-0 bg-emerald-700 md:bg-transparent w-full md:w-auto py-10 md:py-0 flex-col md:flex-row transition-all duration-300 z-10
+          ${active ? "opacity-100 pointer-events-auto" : "opacity-0 pointer-events-none"} md:opacity-100 md:pointer-events-auto`}
+        >
+          {[
+            { label: "Beranda", path: "/" },
+            { label: "Layanan", path: "/services" },
+            { label: "Booking", path: "/booking" },
+            { label: "Tanya Sehat", path: "/chatbot" },
+          ].map((item) => (
+            <li key={item.path}>
+              <button
+                onClick={() => handleNavigate(item.path)}
+                className="text-lg font-medium px-4 py-2 rounded-md transition-all duration-300 hover:bg-white/10 hover:shadow-md hover:shadow-white/30"
+              >
+                {item.label}
+              </button>
+            </li>
+          ))}
+
+          {isLoggedIn ? (
+            <li className="flex items-center gap-4 flex-col md:flex-row mt-4 md:mt-0 relative" ref={dropdownRef}>
               <button
                 onClick={() => setIsDropdownOpen(!isDropdownOpen)}
-                className="flex items-center text-emerald-600 font-semibold px-4 py-2 rounded-full border border-emerald-600 hover:bg-emerald-50 transition"
+                className="text-lg font-semibold text-white flex items-center gap-2"
               >
-                Halo, {currentUser.username}! 
+                Halo, {currentUser?.username || 'User'}!
                 <svg
-                  className={`w-4 h-4 ml-2 transition-transform ${isDropdownOpen ? 'rotate-180' : ''}`}
+                  className={`w-4 h-4 transition-transform ${isDropdownOpen ? 'rotate-180' : ''}`}
                   fill="none"
                   stroke="currentColor"
                   viewBox="0 0 24 24"
@@ -67,27 +101,39 @@ function Navbar() {
               </button>
 
               {isDropdownOpen && (
-                <div className="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg py-1 z-10">
+                <div className="absolute right-0 md:top-full mt-2 md:mt-0 w-48 bg-emerald-700 md:bg-emerald-800 rounded-md shadow-lg py-1 z-20">
                   <button
-                    onClick={handleLogoutClick} // Memanggil fungsi logout yang terhubung dengan AuthContext
-                    className="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                    onClick={handleLogoutClick}
+                    className="block w-full text-left px-4 py-2 text-sm text-white hover:bg-white/10"
                   >
                     Logout
                   </button>
                 </div>
               )}
-            </div>
+            </li>
           ) : (
-            // Tampilkan tombol Login/Register jika tidak login dan AuthContext sudah selesai loading
-            !loading && (
-              <Link to="/login" className="px-5 py-2 bg-emerald-600 text-white rounded-full hover:bg-emerald-700 transition">
-                Login
-              </Link>
-            )
+            <>
+              <li className="w-full md:w-auto mt-4 md:mt-0">
+                <button
+                  onClick={() => handleNavigate("/login")}
+                  className="bg-emerald-500 hover:bg-emerald-600 text-white font-semibold py-2 px-4 rounded-lg shadow-md hover:shadow-lg transition duration-300 ease-in-out focus:outline-none focus:ring-2 focus:ring-emerald-400 focus:ring-opacity-75 w-full md:w-auto"
+                >
+                  Login
+                </button>
+              </li>
+              <li className="w-full md:w-auto mt-2 md:mt-0">
+                <button
+                  onClick={() => handleNavigate("/register")}
+                  className="bg-blue-500 hover:bg-blue-600 text-white font-semibold py-2 px-4 rounded-lg shadow-md hover:shadow-lg transition duration-300 ease-in-out focus:outline-none focus:ring-2 focus:ring-blue-400 focus:ring-opacity-75 w-full md:w-auto"
+                >
+                  Register
+                </button>
+              </li>
+            </>
           )}
-        </div>
+        </ul>
       </div>
-    </nav>
+    </div>
   );
 }
 

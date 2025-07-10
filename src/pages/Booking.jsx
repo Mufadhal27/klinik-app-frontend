@@ -10,7 +10,8 @@ function Booking() {
   useEffect(() => {
     if (!loading) {
       if (!isLoggedIn) {
-        alert('Anda harus login terlebih dahulu untuk mengakses halaman booking.');
+        // Pastikan baris alert ini yang Anda miliki sekarang
+        alert('Anda harus login terlebih dahulu untuk mengakses halaman ini.');
         navigate('/login');
       }
     }
