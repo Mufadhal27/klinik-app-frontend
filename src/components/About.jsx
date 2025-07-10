@@ -6,7 +6,7 @@ function About() {
         {/* FOTO */}
         <div className="w-full md:w-1/2">
           <img
-            src="/src/assets/img/about.jpeg" 
+            src="/img/about.jpeg" 
             alt="Tentang Klinik"
             className="rounded-2xl shadow-lg w-full h-auto object-cover"
           />
