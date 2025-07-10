@@ -99,13 +99,16 @@ function Navbar() {
               </button>
 
               {isDropdownOpen && (
-                <div className="absolute right-0 md:top-full mt-2 md:mt-0 w-48 bg-emerald-700 md:bg-emerald-800 rounded-md shadow-lg py-1 z-20">
-                  <button
-                    onClick={handleLogoutClick}
-                    className="block w-full text-left px-4 py-2 text-sm text-white bg-red-600 hover:bg-red-700 rounded-md transition-colors duration-200" // Kelas CSS diubah di sini
-                  >
-                    Logout
-                  </button>
+                <div className="absolute right-0 md:top-full mt-2 md:mt-0 w-48 bg-white rounded-lg shadow-xl p-2 z-20">
+                    <p className="text-gray-800 text-sm font-medium px-2 py-1 mb-2">
+                        {currentUser?.username || 'User'}
+                    </p>
+                    <button
+                        onClick={handleLogoutClick}
+                        className="bg-red-500 hover:bg-red-600 text-white font-semibold py-2 px-4 rounded-lg shadow-md hover:shadow-lg transition duration-300 ease-in-out focus:outline-none focus:ring-2 focus:ring-red-400 focus:ring-opacity-75 w-full text-center"
+                    >
+                        Logout
+                    </button>
                 </div>
               )}
             </li>
