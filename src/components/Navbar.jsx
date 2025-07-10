@@ -1,27 +1,26 @@
 import { useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
-import { useAuth } from '../contexts/AuthContext'; // Pastikan path ini benar
+import { useAuth } from '../contexts/AuthContext';
 
 function Navbar() {
-  const [active, setActive] = useState(false); // Untuk mobile menu
-  const [isDropdownOpen, setIsDropdownOpen] = useState(false); // Untuk dropdown username
+  const [active, setActive] = useState(false);
+  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const navigate = useNavigate();
-  const dropdownRef = useRef(null); // Ref untuk menutup dropdown saat klik di luar
+  const dropdownRef = useRef(null);
 
   const { isLoggedIn, currentUser, logout, loading } = useAuth();
 
   const handleNavigate = (path) => {
     navigate(path);
-    setActive(false); // Tutup mobile menu saat navigasi
+    setActive(false);
   };
 
-  const handleLogoutClick = () => { // Ganti nama agar tidak konflik dengan fungsi logout dari context
-    logout(); // Panggil fungsi logout dari AuthContext
-    setActive(false); // Tutup mobile menu
-    setIsDropdownOpen(false); // Tutup dropdown
+  const handleLogoutClick = () => {
+    logout();
+    setActive(false);
+    setIsDropdownOpen(false);
   };
 
-  // Efek untuk menutup dropdown (username) saat klik di luar
   useEffect(() => {
     function handleClickOutside(event) {
       if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
@@ -34,7 +33,6 @@ function Navbar() {
     };
   }, [dropdownRef]);
 
-  // Tampilkan null atau loading indicator jika AuthContext sedang memuat
   if (loading) {
     return null;
   }
@@ -104,7 +102,7 @@ function Navbar() {
                 <div className="absolute right-0 md:top-full mt-2 md:mt-0 w-48 bg-emerald-700 md:bg-emerald-800 rounded-md shadow-lg py-1 z-20">
                   <button
                     onClick={handleLogoutClick}
-                    className="block w-full text-left px-4 py-2 text-sm text-white hover:bg-white/10"
+                    className="block w-full text-left px-4 py-2 text-sm text-white bg-red-600 hover:bg-red-700 rounded-md transition-colors duration-200" // Kelas CSS diubah di sini
                   >
                     Logout
                   </button>
