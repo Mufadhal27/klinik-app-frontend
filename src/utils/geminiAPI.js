@@ -1,12 +1,11 @@
-import axios from "axios";
+import api from './axiosConfig'; 
 
-// Pastikan ini ambil dari .env
-const backendBaseUrl = import.meta.env.VITE_APP_BACKEND_URL;
-console.log("DEBUG: backendBaseUrl yang digunakan:", backendBaseUrl);
 
 export async function sendMessageToGemini(prompt) {
   try {
-    const response = await axios.post(`${backendBaseUrl}/api/chat`, { prompt }); 
+    // Gunakan instance `api` untuk mengirim POST request
+    // Endpoint menjadi `/chat` karena baseURL di `axiosConfig.js` sudah mencakup `/api`
+    const response = await api.post('/chat', { prompt }); 
     return response.data.response;
   } catch (err) {
     console.error("❌ Error di frontend saat panggil backend:", err);

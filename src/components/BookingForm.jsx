@@ -1,22 +1,43 @@
 import { useEffect, useState } from "react";
 import { useLocation } from "react-router-dom";
-import { createBooking } from "../utils/bookingAPI";
+import { createBooking, updateBooking } from "../utils/bookingAPI";
 
-function BookingForm() {
+function BookingForm({ initialData, onBookingSuccess }) {
   const location = useLocation();
   const queryParams = new URLSearchParams(location.search);
   const defaultLayanan = queryParams.get("layanan");
 
-  const [formData, setFormData] = useState({
+  const initialFormState = {
     nama: "",
     layanan: defaultLayanan || "",
     tanggal: "",
     jam: "",
+    userEmail: "",
+    userPhone: "",
     catatan: "",
-  });
+  };
 
+  const [formData, setFormData] = useState(initialFormState);
   const [successMessage, setSuccessMessage] = useState("");
   const [errorMessage, setErrorMessage] = useState("");
+
+  useEffect(() => {
+    if (initialData) {
+      setFormData({
+        nama: initialData.userName || "",
+        layanan: initialData.serviceName || "",
+        tanggal: initialData.bookingDate ? new Date(initialData.bookingDate).toISOString().split('T')[0] : "",
+        jam: initialData.bookingTime || "",
+        userEmail: initialData.userEmail || "",
+        userPhone: initialData.userPhone || "",
+        catatan: initialData.notes || "",
+      });
+    } else {
+      setFormData(initialFormState);
+    }
+    setSuccessMessage("");
+    setErrorMessage("");
+  }, [initialData]);
 
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
@@ -26,18 +47,30 @@ function BookingForm() {
     e.preventDefault();
 
     try {
-      await createBooking(formData);
-      setSuccessMessage("✅ Booking berhasil dikirim!");
+      if (initialData && initialData._id) {
+        await updateBooking(initialData._id, {
+            serviceName: formData.layanan,
+            bookingDate: formData.tanggal,
+            bookingTime: formData.jam,
+            userName: formData.nama,
+            userEmail: formData.userEmail,
+            userPhone: formData.userPhone,
+            notes: formData.catatan,
+        });
+        setSuccessMessage("✅ Booking berhasil diperbarui!");
+      } else {
+        await createBooking(formData);
+        setSuccessMessage("✅ Booking berhasil dikirim!");
+      }
       setErrorMessage("");
-      setFormData({
-        nama: "",
-        layanan: "",
-        tanggal: "",
-        jam: "",
-        catatan: "",
-      });
+      setFormData(initialFormState);
+      
+      if (onBookingSuccess) {
+        onBookingSuccess();
+      }
+
     } catch (error) {
-      console.error("❌ Gagal kirim booking:", error);
+      console.error("❌ Gagal kirim/update booking:", error);
       if (error.response) {
         setErrorMessage(`Terjadi kesalahan: ${error.response.data.error || error.response.statusText}`);
       } else if (error.request) {
@@ -112,6 +145,30 @@ function BookingForm() {
       </div>
 
       <div>
+        <label className="block text-gray-700 mb-1">Email</label>
+        <input
+          type="email"
+          name="userEmail"
+          value={formData.userEmail}
+          onChange={handleChange}
+          className="w-full px-4 py-2 rounded border border-gray-300 focus:outline-none focus:ring-2 focus:ring-emerald-500"
+          required
+        />
+      </div>
+
+      <div>
+        <label className="block text-gray-700 mb-1">Nomor Telepon</label>
+        <input
+          type="tel"
+          name="userPhone"
+          value={formData.userPhone}
+          onChange={handleChange}
+          className="w-full px-4 py-2 rounded border border-gray-300 focus:outline-none focus:ring-2 focus:ring-emerald-500"
+          required
+        />
+      </div>
+
+      <div>
         <label className="block text-gray-700 mb-1">Catatan Tambahan</label>
         <textarea
           name="catatan"
@@ -126,7 +183,7 @@ function BookingForm() {
         type="submit"
         className="w-full py-2 bg-emerald-600 text-white rounded hover:bg-emerald-700 transition"
       >
-        Kirim Booking
+        {initialData ? "Update Booking" : "Kirim Booking"}
       </button>
     </form>
   );

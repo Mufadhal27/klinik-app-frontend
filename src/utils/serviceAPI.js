@@ -1,43 +1,47 @@
-import axios from "axios";
+import api from './axiosConfig'; 
 
-const backendBaseUrl = import.meta.env.VITE_APP_BACKEND_URL;
 
 export const getAllServices = async () => {
   try {
-    const response = await axios.get(`${backendBaseUrl}/api/service`);
+    // Gunakan instance `api` yang sudah diatur baseURL-nya
+    // Endpoint menjadi `/service` karena baseURL sudah mencakup `/api`
+    const response = await api.get('/service');
     return response.data;
   } catch (error) {
-    console.error("❌ Gagal mengambil layanan:", error);
+    console.error("❌ Gagal mengambil layanan:", error.response?.data || error.message);
     throw error;
   }
 };
 
 export const createService = async (data) => {
   try {
-    const response = await axios.post(`${backendBaseUrl}/api/service`, data);
+    // Gunakan instance `api` untuk mengirim POST request
+    const response = await api.post('/service', data);
     return response.data;
   } catch (error) {
-    console.error("❌ Gagal membuat layanan:", error);
+    console.error("❌ Gagal membuat layanan:", error.response?.data || error.message);
     throw error;
   }
 };
 
 export const updateService = async (id, data) => {
   try {
-    const response = await axios.put(`${backendBaseUrl}/api/service/${id}`, data);
+    // Gunakan instance `api` untuk mengirim PUT request
+    const response = await api.put(`/service/${id}`, data);
     return response.data;
   } catch (error) {
-    console.error(`❌ Gagal mengupdate layanan ID: ${id}`, error);
+    console.error(`❌ Gagal mengupdate layanan ID: ${id}`, error.response?.data || error.message);
     throw error;
   }
 };
 
 export const deleteService = async (id) => {
   try {
-    const response = await axios.delete(`${backendBaseUrl}/api/service/${id}`);
+    // Gunakan instance `api` untuk mengirim DELETE request
+    const response = await api.delete(`/service/${id}`);
     return response.data;
   } catch (error) {
-    console.error(`❌ Gagal menghapus layanan ID: ${id}`, error);
+    console.error(`❌ Gagal menghapus layanan ID: ${id}`, error.response?.data || error.message);
     throw error;
   }
 };
