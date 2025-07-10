@@ -6,7 +6,7 @@ console.log("DEBUG: backendBaseUrl yang digunakan:", backendBaseUrl);
 
 export async function sendMessageToGemini(prompt) {
   try {
-    const response = await axios.post(`${backendBaseUrl}/chat`, { prompt });
+    const response = await axios.post(`${backendBaseUrl}/api/chat`, { prompt }); 
     return response.data.response;
   } catch (err) {
     console.error("❌ Error di frontend saat panggil backend:", err);

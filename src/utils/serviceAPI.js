@@ -2,10 +2,9 @@ import axios from "axios";
 
 const backendBaseUrl = import.meta.env.VITE_APP_BACKEND_URL;
 
-// Ambil semua layanan
 export const getAllServices = async () => {
   try {
-    const response = await axios.get(`${backendBaseUrl}/service`);
+    const response = await axios.get(`${backendBaseUrl}/api/service`);
     return response.data;
   } catch (error) {
     console.error("❌ Gagal mengambil layanan:", error);
@@ -13,10 +12,9 @@ export const getAllServices = async () => {
   }
 };
 
-// Buat layanan baru
 export const createService = async (data) => {
   try {
-    const response = await axios.post(`${backendBaseUrl}/service`, data);
+    const response = await axios.post(`${backendBaseUrl}/api/service`, data);
     return response.data;
   } catch (error) {
     console.error("❌ Gagal membuat layanan:", error);
@@ -24,10 +22,9 @@ export const createService = async (data) => {
   }
 };
 
-// Update layanan
 export const updateService = async (id, data) => {
   try {
-    const response = await axios.put(`${backendBaseUrl}/service/${id}`, data);
+    const response = await axios.put(`${backendBaseUrl}/api/service/${id}`, data);
     return response.data;
   } catch (error) {
     console.error(`❌ Gagal mengupdate layanan ID: ${id}`, error);
@@ -35,10 +32,9 @@ export const updateService = async (id, data) => {
   }
 };
 
-// Hapus layanan
 export const deleteService = async (id) => {
   try {
-    const response = await axios.delete(`${backendBaseUrl}/service/${id}`);
+    const response = await axios.delete(`${backendBaseUrl}/api/service/${id}`);
     return response.data;
   } catch (error) {
     console.error(`❌ Gagal menghapus layanan ID: ${id}`, error);
