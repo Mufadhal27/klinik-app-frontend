@@ -3,24 +3,25 @@ import { useNavigate } from "react-router-dom";
 import { useAuth } from '../contexts/AuthContext';
 
 function Navbar() {
-  const [active, setActive] = useState(false);
-  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+  const [active, setActive] = useState(false); // Untuk mobile menu (hamburger)
+  const [isDropdownOpen, setIsDropdownOpen] = useState(false); // Untuk dropdown username (desktop)
   const navigate = useNavigate();
-  const dropdownRef = useRef(null);
+  const dropdownRef = useRef(null); // Ref untuk menutup dropdown username saat klik di luar
 
   const { isLoggedIn, currentUser, logout, loading } = useAuth();
 
   const handleNavigate = (path) => {
     navigate(path);
-    setActive(false);
+    setActive(false); // Tutup mobile menu saat navigasi
   };
 
   const handleLogoutClick = () => {
     logout();
-    setActive(false);
-    setIsDropdownOpen(false);
+    setActive(false); // Tutup mobile menu (jika sedang terbuka)
+    setIsDropdownOpen(false); // Tutup dropdown username (jika sedang terbuka)
   };
 
+  // Efek untuk menutup dropdown username saat klik di luar
   useEffect(() => {
     function handleClickOutside(event) {
       if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
@@ -33,6 +34,7 @@ function Navbar() {
     };
   }, [dropdownRef]);
 
+  // Tampilkan null jika AuthContext sedang memuat
   if (loading) {
     return null;
   }
@@ -80,8 +82,9 @@ function Navbar() {
             </li>
           ))}
 
-          {isLoggedIn ? (
-            <li className="flex items-center gap-4 flex-col md:flex-row mt-4 md:mt-0 relative" ref={dropdownRef}>
+          {/* Bagian untuk pengguna yang sudah login - Desktop View */}
+          {isLoggedIn && (
+            <li className="hidden md:flex items-center gap-4 relative" ref={dropdownRef}>
               <button
                 onClick={() => setIsDropdownOpen(!isDropdownOpen)}
                 className="text-lg font-semibold text-white flex items-center gap-2"
@@ -99,22 +102,27 @@ function Navbar() {
               </button>
 
               {isDropdownOpen && (
-                <div className="absolute right-0 md:top-full mt-2 md:mt-0 w-48 bg-emerald-800 rounded-lg shadow-xl p-2 z-20">
-                    <p className="text-gray-800 text-sm font-medium px-2 py-1 mb-2">
-                        {currentUser?.username || 'User'}
-                    </p>
-                    <button
-                        onClick={handleLogoutClick}
-                        className="bg-red-500 hover:bg-red-600 text-white font-semibold py-2 px-4 rounded-lg shadow-md hover:shadow-lg transition duration-300 ease-in-out focus:outline-none focus:ring-2 focus:ring-red-400 focus:ring-opacity-75 w-full text-center"
-                    >
-                        Logout
-                    </button>
+                // Dropdown container styling sesuai gambar "Lainnya"
+                <div className="absolute right-0 top-full mt-2 w-48 bg-white rounded-lg shadow-xl p-2 z-20">
+                  <p className="text-gray-800 text-sm font-medium px-2 py-1 mb-2">
+                    {currentUser?.username || 'User'}
+                  </p>
+                  {/* Tombol Logout dengan gaya Login/Register, warna merah, dan lebar penuh */}
+                  <button
+                    onClick={handleLogoutClick}
+                    className="bg-red-500 hover:bg-red-600 text-white font-semibold py-2 px-4 rounded-lg shadow-md hover:shadow-lg transition duration-300 ease-in-out focus:outline-none focus:ring-2 focus:ring-red-400 focus:ring-opacity-75 w-full text-center"
+                  >
+                    Logout
+                  </button>
                 </div>
               )}
             </li>
-          ) : (
+          )}
+
+          {/* Bagian untuk pengguna yang belum login - Desktop View */}
+          {!isLoggedIn && (
             <>
-              <li className="w-full md:w-auto mt-4 md:mt-0">
+              <li className="hidden md:block w-full md:w-auto mt-4 md:mt-0">
                 <button
                   onClick={() => handleNavigate("/login")}
                   className="bg-emerald-500 hover:bg-emerald-600 text-white font-semibold py-2 px-4 rounded-lg shadow-md hover:shadow-lg transition duration-300 ease-in-out focus:outline-none focus:ring-2 focus:ring-emerald-400 focus:ring-opacity-75 w-full md:w-auto"
@@ -122,10 +130,51 @@ function Navbar() {
                   Login
                 </button>
               </li>
-              <li className="w-full md:w-auto mt-2 md:mt-0">
+              <li className="hidden md:block w-full md:w-auto mt-2 md:mt-0">
                 <button
                   onClick={() => handleNavigate("/register")}
                   className="bg-blue-500 hover:bg-blue-600 text-white font-semibold py-2 px-4 rounded-lg shadow-md hover:shadow-lg transition duration-300 ease-in-out focus:outline-none focus:ring-2 focus:ring-blue-400 focus:ring-opacity-75 w-full md:w-auto"
+                >
+                  Register
+                </button>
+              </li>
+            </>
+          )}
+
+          {/* Bagian untuk pengguna yang sudah login */}
+          {isLoggedIn && (
+            <>
+              <li className="md:hidden w-full mt-4">
+                <span className="text-lg font-semibold text-white px-4 py-2 block text-center">
+                  Halo, {currentUser?.username || 'User'}!
+                </span>
+              </li>
+              <li className="md:hidden w-full mt-2">
+                <button
+                  onClick={handleLogoutClick}
+                  className="bg-red-500 hover:bg-red-600 text-white font-semibold py-2 px-4 rounded-lg shadow-md hover:shadow-lg transition duration-300 ease-in-out focus:outline-none focus:ring-2 focus:ring-red-400 focus:ring-opacity-75 w-full text-center"
+                >
+                  Logout
+                </button>
+              </li>
+            </>
+          )}
+
+          {/* Bagian untuk pengguna yang belum login) */}
+          {!isLoggedIn && (
+            <>
+              <li className="md:hidden w-full mt-4">
+                <button
+                  onClick={() => handleNavigate("/login")}
+                  className="bg-emerald-500 hover:bg-emerald-600 text-white font-semibold py-2 px-4 rounded-lg shadow-md hover:shadow-lg transition duration-300 ease-in-out focus:outline-none focus:ring-2 focus:ring-emerald-400 focus:ring-opacity-75 w-full text-center"
+                >
+                  Login
+                </button>
+              </li>
+              <li className="md:hidden w-full mt-2">
+                <button
+                  onClick={() => handleNavigate("/register")}
+                  className="bg-blue-500 hover:bg-blue-600 text-white font-semibold py-2 px-4 rounded-lg shadow-md hover:shadow-lg transition duration-300 ease-in-out focus:outline-none focus:ring-2 focus:ring-blue-400 focus:ring-opacity-75 w-full text-center"
                 >
                   Register
                 </button>
