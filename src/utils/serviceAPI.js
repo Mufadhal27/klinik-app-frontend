@@ -16,7 +16,7 @@ export const getAllServices = async () => {
 export const createService = async (data) => {
   try {
     // Gunakan instance `api` untuk mengirim POST request
-    const response = await api.post('/service', data);
+    const response = await api.post('api/service', data);
     return response.data;
   } catch (error) {
     console.error("❌ Gagal membuat layanan:", error.response?.data || error.message);
@@ -27,7 +27,7 @@ export const createService = async (data) => {
 export const updateService = async (id, data) => {
   try {
     // Gunakan instance `api` untuk mengirim PUT request
-    const response = await api.put(`/service/${id}`, data);
+    const response = await api.put(`api/service/${id}`, data);
     return response.data;
   } catch (error) {
     console.error(`❌ Gagal mengupdate layanan ID: ${id}`, error.response?.data || error.message);
@@ -38,7 +38,7 @@ export const updateService = async (id, data) => {
 export const deleteService = async (id) => {
   try {
     // Gunakan instance `api` untuk mengirim DELETE request
-    const response = await api.delete(`/service/${id}`);
+    const response = await api.delete(`api/service/${id}`);
     return response.data;
   } catch (error) {
     console.error(`❌ Gagal menghapus layanan ID: ${id}`, error.response?.data || error.message);

@@ -15,7 +15,7 @@ api.interceptors.request.use(
     const user = JSON.parse(localStorage.getItem('user'));
     const token = user?.token;
 
-    if (token && !config.url.includes('/login')) {
+    if (token && !config.url.includes('api/login')) {
       config.headers.Authorization = `Bearer ${token}`;
     }
 

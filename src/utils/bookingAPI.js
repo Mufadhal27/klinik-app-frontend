@@ -3,7 +3,7 @@ import { jwtDecode } from 'jwt-decode';
 
 export const getAllBookings = async () => {
   try {
-    const response = await api.get('/booking');
+    const response = await api.get('api/booking');
     return response.data;
   } catch (error) {
     console.error("Error fetching all bookings:", error.response?.data || error.message);
@@ -38,7 +38,7 @@ export const createBooking = async (bookingData) => {
       notes: bookingData.catatan,
     };
 
-    const response = await api.post('/booking', payload, {
+    const response = await api.post('api/booking', payload, {
       headers: {
         Authorization: `Bearer ${user.token}`,
       },
@@ -58,7 +58,7 @@ export const updateBooking = async (id, updatedData) => {
       throw new Error("User not authenticated.");
     }
 
-    const response = await api.put(`/booking?id=${id}`, updatedData, {
+    const response = await api.put(`api/booking?id=${id}`, updatedData, {
       headers: {
         Authorization: `Bearer ${user.token}`,
       },
@@ -78,7 +78,7 @@ export const deleteBooking = async (id) => {
       throw new Error("User not authenticated.");
     }
 
-    const response = await api.delete(`/booking?id=${id}`, {
+    const response = await api.delete(`api/booking?id=${id}`, {
       headers: {
         Authorization: `Bearer ${user.token}`,
       },
