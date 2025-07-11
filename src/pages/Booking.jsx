@@ -1,137 +1,193 @@
-import React, { useEffect, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { useAuth } from '../contexts/AuthContext';
-import BookingForm from "../components/BookingForm";
-import { getAllBookings, updateBooking, deleteBooking } from "../utils/bookingAPI";
+import { useEffect, useState } from "react";
+import { useLocation } from "react-router-dom";
+import { createBooking, updateBooking } from "../utils/bookingAPI";
 
-function Booking() {
-  const navigate = useNavigate();
-  const { user, loading } = useAuth();
-  const isLoggedIn = user !== null;
+function BookingForm({ initialData, onBookingSuccess }) {
+  const location = useLocation();
+  const queryParams = new URLSearchParams(location.search);
+  const defaultLayanan = queryParams.get("layanan");
 
-  const [userBookings, setUserBookings] = useState([]);
-  const [editingBooking, setEditingBooking] = useState(null);
-  const [formKey, setFormKey] = useState(0);
-
-  const fetchUserBookings = async () => {
-    if (isLoggedIn && user?.id) {
-      try {
-        const response = await getAllBookings();
-        const filteredBookings = response.data.filter(booking => booking.userId === user.id);
-        setUserBookings(filteredBookings);
-      } catch (error) {
-        console.error("Gagal mengambil riwayat booking:", error);
-      }
-    }
+  const initialFormState = {
+    nama: "",
+    layanan: defaultLayanan || "",
+    tanggal: "",
+    jam: "",
+    userEmail: "",
+    userPhone: "",
+    catatan: "",
   };
+
+  const [formData, setFormData] = useState(initialFormState);
+  const [successMessage, setSuccessMessage] = useState("");
+  const [errorMessage, setErrorMessage] = useState("");
 
   useEffect(() => {
-    if (!loading) {
-      if (!isLoggedIn) {
-        alert('Anda harus login terlebih dahulu untuk mengakses halaman ini.');
-        navigate('/login');
+    if (initialData) {
+      setFormData({
+        nama: initialData.userName || "",
+        layanan: initialData.serviceName || "",
+        tanggal: initialData.bookingDate
+          ? new Date(initialData.bookingDate).toISOString().split("T")[0]
+          : "",
+        jam: initialData.bookingTime || "",
+        userEmail: initialData.userEmail || "",
+        userPhone: initialData.userPhone || "",
+        catatan: initialData.notes || "",
+      });
+    } else {
+      setFormData(initialFormState);
+    }
+    setSuccessMessage("");
+    setErrorMessage("");
+  }, [initialData]);
+
+  const handleChange = (e) => {
+    setFormData({ ...formData, [e.target.name]: e.target.value });
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+
+    try {
+      if (initialData && initialData._id) {
+        await updateBooking(initialData._id, {
+          serviceName: formData.layanan,
+          bookingDate: formData.tanggal,
+          bookingTime: formData.jam,
+          userName: formData.nama,
+          userEmail: formData.userEmail,
+          userPhone: formData.userPhone,
+          notes: formData.catatan,
+        });
+        setSuccessMessage("✅ Booking berhasil diperbarui!");
       } else {
-        fetchUserBookings();
+        await createBooking(formData);
+        setSuccessMessage("✅ Booking berhasil dikirim!");
       }
-    }
-  }, [isLoggedIn, loading, navigate, user?.id]);
 
-  const handleEdit = (booking) => {
-    setEditingBooking(booking);
-    setFormKey(prevKey => prevKey + 1);
-    window.scrollTo({ top: 0, behavior: 'smooth' });
-  };
+      setErrorMessage("");
+      setFormData(initialFormState);
 
-  const handleDelete = async (bookingId) => {
-    if (window.confirm('Apakah Anda yakin ingin menghapus booking ini?')) {
-      try {
-        await deleteBooking(bookingId);
-        alert('Booking berhasil dihapus!');
-        fetchUserBookings();
-      } catch (error) {
-        console.error("Gagal menghapus booking:", error);
-        alert('Gagal menghapus booking. Silakan coba lagi.');
+      if (onBookingSuccess) {
+        onBookingSuccess();
       }
+    } catch (error) {
+      console.error("❌ Gagal kirim/update booking:", error);
+      const msg =
+        error.response?.data?.error ||
+        error.response?.data?.message ||
+        error.message ||
+        "Terjadi kesalahan saat memproses booking.";
+      setErrorMessage(msg);
+      setSuccessMessage("");
     }
   };
-
-  const handleBookingFormSubmitSuccess = () => {
-    setEditingBooking(null);
-    setFormKey(prevKey => prevKey + 1);
-    fetchUserBookings();
-  };
-
-  if (loading) {
-    return (
-      <section className="min-h-screen flex items-center justify-center bg-slate-50">
-        <div>Memuat...</div>
-      </section>
-    );
-  }
-
-  if (!isLoggedIn) {
-    return null;
-  }
 
   return (
-    <section className="min-h-screen px-6 md:px-20 py-24 bg-slate-50">
-      <div className="max-w-2xl mx-auto bg-white rounded-2xl shadow-md p-8">
-        <h1 className="text-4xl font-bold text-center text-emerald-700 mb-4">
-          Form Booking
-        </h1>
+    <form onSubmit={handleSubmit} className="space-y-6">
+      {successMessage && (
+        <div className="bg-green-100 border border-green-300 text-green-800 px-4 py-3 rounded shadow-sm">
+          {successMessage}
+        </div>
+      )}
 
-        <p className="text-center text-gray-600 mb-8 leading-relaxed">
-          Isi formulir di bawah ini untuk membuat janji temu dengan tenaga medis kami. Tim kami akan segera menghubungi Anda untuk konfirmasi lebih lanjut.
-        </p>
+      {errorMessage && (
+        <div className="bg-red-100 border border-red-300 text-red-800 px-4 py-3 rounded shadow-sm">
+          {errorMessage}
+        </div>
+      )}
 
-        <BookingForm
-          key={formKey}
-          initialData={editingBooking}
-          onBookingSuccess={handleBookingFormSubmitSuccess}
+      <div>
+        <label className="block text-gray-700 mb-1">Nama Lengkap</label>
+        <input
+          type="text"
+          name="nama"
+          value={formData.nama}
+          onChange={handleChange}
+          className="w-full px-4 py-2 rounded border border-gray-300 focus:outline-none focus:ring-2 focus:ring-emerald-500"
+          required
         />
-
-        <p className="text-sm text-gray-500 text-center mt-6">
-          Butuh bantuan? Hubungi kami melalui WhatsApp atau datang langsung ke klinik Medisia terdekat.
-        </p>
-
-        <h2 className="text-3xl font-bold text-center text-emerald-700 mt-12 mb-6">
-          Riwayat Booking Anda
-        </h2>
-
-        {userBookings.length === 0 ? (
-          <p className="text-center text-gray-600">Anda belum memiliki booking.</p>
-        ) : (
-          <div className="space-y-4">
-            {userBookings.map((booking) => (
-              <div key={booking._id} className="p-4 border rounded-lg shadow-sm bg-gray-50 flex flex-col md:flex-row justify-between items-start md:items-center">
-                <div className="flex-grow">
-                  <p className="font-semibold text-lg text-emerald-800">{booking.serviceName}</p>
-                  <p className="text-gray-700">Tanggal: {new Date(booking.bookingDate).toLocaleDateString()}</p>
-                  <p className="text-gray-700">Jam: {booking.bookingTime}</p>
-                  <p className="text-gray-700">Status: <span className={`font-medium ${booking.status === 'pending' ? 'text-orange-600' : booking.status === 'confirmed' ? 'text-green-600' : 'text-red-600'}`}>{booking.status}</span></p>
-                  {booking.notes && <p className="text-gray-600 text-sm italic">Catatan: {booking.notes}</p>}
-                </div>
-                <div className="mt-4 md:mt-0 md:ml-4 flex space-x-2">
-                  <button
-                    onClick={() => handleEdit(booking)}
-                    className="px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600 transition"
-                  >
-                    Edit
-                  </button>
-                  <button
-                    onClick={() => handleDelete(booking._id)}
-                    className="px-4 py-2 bg-red-500 text-white rounded-md hover:bg-red-600 transition"
-                  >
-                    Hapus
-                  </button>
-                </div>
-              </div>
-            ))}
-          </div>
-        )}
       </div>
-    </section>
+
+      <div>
+        <label className="block text-gray-700 mb-1">Layanan</label>
+        <input
+          type="text"
+          name="layanan"
+          value={formData.layanan}
+          onChange={handleChange}
+          className="w-full px-4 py-2 rounded border border-gray-300 focus:outline-none focus:ring-2 focus:ring-emerald-500"
+          required
+        />
+      </div>
+
+      <div>
+        <label className="block text-gray-700 mb-1">Tanggal Booking</label>
+        <input
+          type="date"
+          name="tanggal"
+          value={formData.tanggal}
+          onChange={handleChange}
+          className="w-full px-4 py-2 rounded border border-gray-300 focus:outline-none focus:ring-2 focus:ring-emerald-500"
+          required
+        />
+      </div>
+
+      <div>
+        <label className="block text-gray-700 mb-1">Jam Kunjungan</label>
+        <input
+          type="time"
+          name="jam"
+          value={formData.jam}
+          onChange={handleChange}
+          className="w-full px-4 py-2 rounded border border-gray-300 focus:outline-none focus:ring-2 focus:ring-emerald-500"
+          required
+        />
+      </div>
+
+      <div>
+        <label className="block text-gray-700 mb-1">Email</label>
+        <input
+          type="email"
+          name="userEmail"
+          value={formData.userEmail}
+          onChange={handleChange}
+          className="w-full px-4 py-2 rounded border border-gray-300 focus:outline-none focus:ring-2 focus:ring-emerald-500"
+          required
+        />
+      </div>
+
+      <div>
+        <label className="block text-gray-700 mb-1">Nomor Telepon</label>
+        <input
+          type="tel"
+          name="userPhone"
+          value={formData.userPhone}
+          onChange={handleChange}
+          className="w-full px-4 py-2 rounded border border-gray-300 focus:outline-none focus:ring-2 focus:ring-emerald-500"
+          required
+        />
+      </div>
+
+      <div>
+        <label className="block text-gray-700 mb-1">Catatan Tambahan</label>
+        <textarea
+          name="catatan"
+          rows="3"
+          value={formData.catatan}
+          onChange={handleChange}
+          className="w-full px-4 py-2 rounded border border-gray-300 focus:outline-none focus:ring-2 focus:ring-emerald-500"
+        />
+      </div>
+
+      <button
+        type="submit"
+        className="w-full py-2 bg-emerald-600 text-white rounded hover:bg-emerald-700 transition"
+      >
+        {initialData ? "Update Booking" : "Kirim Booking"}
+      </button>
+    </form>
   );
 }
 
-export default Booking;
+export default BookingForm;

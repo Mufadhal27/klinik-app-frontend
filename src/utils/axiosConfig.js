@@ -1,7 +1,6 @@
 import axios from 'axios';
-import { jwtDecode } from 'jwt-decode';
 
-const API_BASE_URL = import.meta.env.VITE_APP_BACKEND_URL; 
+const API_BASE_URL = import.meta.env.VITE_APP_BACKEND_URL;
 
 const api = axios.create({
   baseURL: API_BASE_URL,
@@ -10,7 +9,7 @@ const api = axios.create({
   },
 });
 
-// Interceptor untuk menambahkan token autentikasi ke setiap request
+// Interceptor untuk menyisipkan token Authorization sebelum setiap request
 api.interceptors.request.use(
   (config) => {
     try {
@@ -21,7 +20,7 @@ api.interceptors.request.use(
         config.headers.Authorization = `Bearer ${token}`;
       }
     } catch (e) {
-      console.error("Failed to parse user from localStorage or get token:", e);
+      console.error("Gagal mengambil token dari localStorage:", e);
     }
     return config;
   },
@@ -30,4 +29,17 @@ api.interceptors.request.use(
   }
 );
 
-export default api; 
+// Interceptor untuk menangani error respons (misal token invalid/expired)
+api.interceptors.response.use(
+  (response) => response,
+  (error) => {
+    if (error.response?.status === 401 || error.response?.status === 403) {
+      console.warn("Token tidak valid atau kedaluwarsa. Mengarahkan ke halaman login.");
+      localStorage.removeItem('user');
+      window.location.href = '/login';
+    }
+    return Promise.reject(error);
+  }
+);
+
+export default api;
