@@ -5,7 +5,7 @@ export async function sendMessageToGemini(prompt) {
   try {
     // Gunakan instance `api` untuk mengirim POST request
     // Endpoint menjadi `/chat` karena baseURL di `axiosConfig.js` sudah mencakup `/api`
-    const response = await api.post('/chat', { prompt }); 
+    const response = await api.post('api/chat', { prompt }); 
     return response.data.response;
   } catch (err) {
     console.error("❌ Error di frontend saat panggil backend:", err);

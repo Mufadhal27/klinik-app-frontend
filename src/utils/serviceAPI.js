@@ -5,7 +5,7 @@ export const getAllServices = async () => {
   try {
     // Gunakan instance `api` yang sudah diatur baseURL-nya
     // Endpoint menjadi `/service` karena baseURL sudah mencakup `/api`
-    const response = await api.get('/service');
+    const response = await api.get('api/service');
     return response.data;
   } catch (error) {
     console.error("❌ Gagal mengambil layanan:", error.response?.data || error.message);

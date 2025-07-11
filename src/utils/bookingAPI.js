@@ -3,7 +3,7 @@ import { jwtDecode } from 'jwt-decode';
 
 export const getAllBookings = async () => {
     try {
-        const response = await api.get('/booking');
+        const response = await api.get('api/booking');
         return response.data;
     } catch (error) {
         console.error("Error fetching all bookings:", error.response?.data || error.message);
