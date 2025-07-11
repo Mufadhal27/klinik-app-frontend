@@ -1,5 +1,5 @@
 import api from './axiosConfig';
-import jwtDecode from 'jwt-decode';
+import { jwtDecode } from 'jwt-decode';
 
 export const getAllBookings = async () => {
   try {
