@@ -17,18 +17,16 @@ export const AuthProvider = ({ children }) => {
       const storedUser = localStorage.getItem('user');
       if (storedUser) {
         try {
-          const userObj = JSON.parse(storedUser);
-          const decoded = jwtDecode(userObj.token);
+          const parsedUser = JSON.parse(storedUser);
+          const decoded = jwtDecode(parsedUser.token);
+
+          // Cek apakah token belum expired
           if (decoded.exp * 1000 > Date.now()) {
             setIsLoggedIn(true);
-            setCurrentUser({
-              id: decoded.user.id,
-              username: decoded.user.username,
-              email: decoded.user.email,
-              role: decoded.user.role
-            });
-            apiClient.defaults.headers.common['Authorization'] = `Bearer ${userObj.token}`;
+            setCurrentUser(decoded.user);
+            apiClient.defaults.headers.common['Authorization'] = `Bearer ${parsedUser.token}`;
           } else {
+            // Token expired
             localStorage.removeItem('user');
           }
         } catch (err) {
@@ -50,22 +48,15 @@ export const AuthProvider = ({ children }) => {
 
       const userObject = {
         token,
-        id: decoded.user.id,
-        username: decoded.user.username,
-        email: decoded.user.email,
-        role: decoded.user.role
+        ...decoded.user
       };
 
       localStorage.setItem('user', JSON.stringify(userObject));
 
       setIsLoggedIn(true);
-      setCurrentUser({
-        id: decoded.user.id,
-        username: decoded.user.username,
-        email: decoded.user.email,
-        role: decoded.user.role
-      });
+      setCurrentUser(decoded.user);
       apiClient.defaults.headers.common['Authorization'] = `Bearer ${token}`;
+
       return { success: true };
     } catch (error) {
       console.error('Login failed:', error.response?.data?.error || error.message);
@@ -73,7 +64,8 @@ export const AuthProvider = ({ children }) => {
       setIsLoggedIn(false);
       setCurrentUser(null);
       delete apiClient.defaults.headers.common['Authorization'];
-      return { success: false, error: error.response?.data?.error || 'Login failed.' };
+
+      return { success: false, error: error.response?.data?.error || 'Login gagal.' };
     }
   };
 

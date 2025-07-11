@@ -9,32 +9,27 @@ const api = axios.create({
   },
 });
 
-// Interceptor untuk menyisipkan token Authorization sebelum setiap request
+// Interceptor untuk menyisipkan token Authorization sebelum setiap request (kecuali login)
 api.interceptors.request.use(
   (config) => {
-    try {
-      const user = JSON.parse(localStorage.getItem('user'));
-      const token = user?.token;
+    const user = JSON.parse(localStorage.getItem('user'));
+    const token = user?.token;
 
-      if (token) {
-        config.headers.Authorization = `Bearer ${token}`;
-      }
-    } catch (e) {
-      console.error("Gagal mengambil token dari localStorage:", e);
+    if (token && !config.url.includes('/login')) {
+      config.headers.Authorization = `Bearer ${token}`;
     }
+
     return config;
   },
-  (error) => {
-    return Promise.reject(error);
-  }
+  (error) => Promise.reject(error)
 );
 
-// Interceptor untuk menangani error respons (misal token invalid/expired)
+// Tangani error jika token invalid
 api.interceptors.response.use(
   (response) => response,
   (error) => {
     if (error.response?.status === 401 || error.response?.status === 403) {
-      console.warn("Token tidak valid atau kedaluwarsa. Mengarahkan ke halaman login.");
+      console.warn("Token tidak valid atau kedaluwarsa. Mengarahkan ke login.");
       localStorage.removeItem('user');
       window.location.href = '/login';
     }
