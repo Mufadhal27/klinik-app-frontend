@@ -7,9 +7,4 @@ export default defineConfig({
   optimizeDeps: {
     include: ['moment', 'jwt-decode'], 
   },
-  build: {
-    rollupOptions: {
-      external: ['moment', 'jwt-decode'], 
-    },
-  },
 });
