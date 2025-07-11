@@ -73,7 +73,7 @@ function BookingForm({ initialData, onBookingSuccess }) {
 
     // Validasi frontend jika jam sudah dibooking
     if (formData.jam && isTimeDisabled(formData.jam)) {
-      setErrorMessage("❌ Slot waktu yang dipilih sudah dibooking. Silakan pilih jam lain.");
+      setErrorMessage("❌ Slot waktu yang dipilih sudah penuh. Silakan pilih jam lain.");
       setSuccessMessage("");
       return;
     }
@@ -148,14 +148,28 @@ function BookingForm({ initialData, onBookingSuccess }) {
 
       <div>
         <label className="block text-gray-700 mb-1">Jam Kunjungan</label>
-        <select name="jam" value={formData.jam} onChange={handleChange} className="w-full border px-4 py-2 rounded" required>
-          <option value="">Pilih Jam</option>
-          {generateTimes().map((time) => (
-            <option key={time} value={time} disabled={isTimeDisabled(time)} className={isTimeDisabled(time) ? "text-red-500" : ""}>
-              {time} {isTimeDisabled(time) ? "(Penuh)" : ""}
-            </option>
-          ))}
-        </select>
+        <div className="relative">
+          <select
+            name="jam"
+            value={formData.jam}
+            onChange={handleChange}
+            className="w-full border px-4 py-2 rounded h-[45px] overflow-y-auto"
+            required
+            style={{ maxHeight: "160px", overflowY: "auto" }}
+          >
+            <option value="">Pilih Jam</option>
+            {generateTimes().map((time) => (
+              <option
+                key={time}
+                value={time}
+                disabled={isTimeDisabled(time)}
+                className={isTimeDisabled(time) ? "text-red-500" : ""}
+              >
+                {time} {isTimeDisabled(time) ? "(Penuh)" : ""}
+              </option>
+            ))}
+          </select>
+        </div>
       </div>
 
       <div>
