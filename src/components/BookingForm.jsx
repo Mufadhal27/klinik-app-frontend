@@ -70,6 +70,14 @@ function BookingForm({ initialData, onBookingSuccess }) {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+
+    // Validasi frontend jika jam sudah dibooking
+    if (formData.jam && isTimeDisabled(formData.jam)) {
+      setErrorMessage("❌ Slot waktu yang dipilih sudah dibooking. Silakan pilih jam lain.");
+      setSuccessMessage("");
+      return;
+    }
+
     try {
       if (initialData && initialData._id) {
         await updateBooking(initialData._id, {
@@ -129,7 +137,7 @@ function BookingForm({ initialData, onBookingSuccess }) {
           value={formData.tanggal}
           onChange={handleChange}
           className={`w-full border px-4 py-2 rounded ${
-            formData.tanggal && new Date(formData.tanggal).getDay() === 0 ? 'text-red-500 font-semibold' : ''
+            formData.tanggal && new Date(formData.tanggal).getDay() === 0 ? 'border-red-500 text-red-600 font-semibold' : ''
           }`}
           required
         />
@@ -143,7 +151,7 @@ function BookingForm({ initialData, onBookingSuccess }) {
         <select name="jam" value={formData.jam} onChange={handleChange} className="w-full border px-4 py-2 rounded" required>
           <option value="">Pilih Jam</option>
           {generateTimes().map((time) => (
-            <option key={time} value={time} disabled={isTimeDisabled(time)}>
+            <option key={time} value={time} disabled={isTimeDisabled(time)} className={isTimeDisabled(time) ? "text-red-500" : ""}>
               {time} {isTimeDisabled(time) ? "(Penuh)" : ""}
             </option>
           ))}
