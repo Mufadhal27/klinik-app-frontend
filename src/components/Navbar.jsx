@@ -3,25 +3,24 @@ import { useNavigate } from "react-router-dom";
 import { useAuth } from '../contexts/AuthContext';
 
 function Navbar() {
-  const [active, setActive] = useState(false); // Untuk mobile menu (hamburger)
-  const [isDropdownOpen, setIsDropdownOpen] = useState(false); // Untuk dropdown username (desktop)
+  const [active, setActive] = useState(false);
+  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const navigate = useNavigate();
-  const dropdownRef = useRef(null); // Ref untuk menutup dropdown username saat klik di luar
+  const dropdownRef = useRef(null);
 
-  const { isLoggedIn, currentUser, logout, loading } = useAuth();
+  const { isLoggedIn, user, logout, loading } = useAuth(); // ✅ gunakan user (bukan currentUser)
 
   const handleNavigate = (path) => {
     navigate(path);
-    setActive(false); // Tutup mobile menu saat navigasi
+    setActive(false);
   };
 
   const handleLogoutClick = () => {
     logout();
-    setActive(false); // Tutup mobile menu (jika sedang terbuka)
-    setIsDropdownOpen(false); // Tutup dropdown username (jika sedang terbuka)
+    setActive(false);
+    setIsDropdownOpen(false);
   };
 
-  // Efek untuk menutup dropdown username saat klik di luar
   useEffect(() => {
     function handleClickOutside(event) {
       if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
@@ -34,7 +33,6 @@ function Navbar() {
     };
   }, [dropdownRef]);
 
-  // Tampilkan null jika AuthContext sedang memuat
   if (loading) {
     return null;
   }
@@ -82,14 +80,13 @@ function Navbar() {
             </li>
           ))}
 
-          {/* Bagian untuk pengguna yang sudah login - Desktop View */}
           {isLoggedIn && (
             <li className="hidden md:flex items-center gap-4 relative" ref={dropdownRef}>
               <button
                 onClick={() => setIsDropdownOpen(!isDropdownOpen)}
                 className="text-lg font-semibold text-white flex items-center gap-2"
               >
-                Halo, {currentUser?.username || 'User'}!
+                Halo, {user?.username || 'User'}!
                 <svg
                   className={`w-4 h-4 transition-transform ${isDropdownOpen ? 'rotate-180' : ''}`}
                   fill="none"
@@ -102,7 +99,6 @@ function Navbar() {
               </button>
 
               {isDropdownOpen && (
-                // Dropdown container styling sesuai gambar "Lainnya"
                 <div className="absolute right-0 top-full mt-2 w-48 bg-emerald-800 rounded-lg shadow-xl p-2 z-20">
                   <button
                     onClick={handleLogoutClick}
@@ -115,7 +111,6 @@ function Navbar() {
             </li>
           )}
 
-          {/* Bagian untuk pengguna yang belum login - Desktop View */}
           {!isLoggedIn && (
             <>
               <li className="hidden md:block w-full md:w-auto mt-4 md:mt-0">
@@ -137,12 +132,11 @@ function Navbar() {
             </>
           )}
 
-          {/* Bagian untuk pengguna yang sudah login */}
           {isLoggedIn && (
             <>
               <li className="md:hidden w-full mt-4">
                 <span className="text-lg font-semibold text-white px-4 py-2 block text-center">
-                  Halo, {currentUser?.username || 'User'}!
+                  Halo, {user?.username || 'User'}!
                 </span>
               </li>
               <li className="md:hidden mt-2">
@@ -156,7 +150,6 @@ function Navbar() {
             </>
           )}
 
-          {/* Bagian untuk pengguna yang belum login) */}
           {!isLoggedIn && (
             <>
               <li className="md:hidden w-full mt-4">
