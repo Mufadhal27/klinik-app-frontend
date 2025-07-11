@@ -1,5 +1,5 @@
 import api from './axiosConfig';
-import { jwtDecode } from 'jwt-decode';
+import jwtDecode from 'jwt-decode';
 
 export const getAllBookings = async () => {
   try {
@@ -91,7 +91,6 @@ export const deleteBooking = async (id) => {
   }
 };
 
-// Tambahan: Fetch Availability (per tanggal dan layanan)
 export const fetchAvailability = async (date, serviceName) => {
   try {
     const response = await api.get(`/api/availability?date=${date}&serviceName=${serviceName}`);
