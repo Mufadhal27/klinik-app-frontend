@@ -90,3 +90,14 @@ export const deleteBooking = async (id) => {
     throw error;
   }
 };
+
+// Tambahan: Fetch Availability (per tanggal dan layanan)
+export const fetchAvailability = async (date, serviceName) => {
+  try {
+    const response = await api.get(`/api/availability?date=${date}&serviceName=${serviceName}`);
+    return response.data.bookedTimes || [];
+  } catch (error) {
+    console.error("Error fetching availability:", error.response?.data || error.message);
+    return [];
+  }
+};
