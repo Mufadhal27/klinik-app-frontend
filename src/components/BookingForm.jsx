@@ -71,7 +71,6 @@ function BookingForm({ initialData, onBookingSuccess }) {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    // Validasi frontend jika jam sudah dibooking
     if (formData.jam && isTimeDisabled(formData.jam)) {
       setErrorMessage("❌ Slot waktu yang dipilih sudah penuh. Silakan pilih jam lain.");
       setSuccessMessage("");
@@ -99,7 +98,12 @@ function BookingForm({ initialData, onBookingSuccess }) {
       if (onBookingSuccess) onBookingSuccess();
     } catch (error) {
       console.error("❌ Gagal submit booking:", error);
-      setErrorMessage(error.response?.data?.error || "Terjadi kesalahan.");
+      setErrorMessage(
+        error.response?.data?.error ||
+        error.response?.data?.message ||
+        error.message ||
+        "Terjadi kesalahan."
+      );
       setSuccessMessage("");
     }
   };
@@ -153,7 +157,7 @@ function BookingForm({ initialData, onBookingSuccess }) {
             name="jam"
             value={formData.jam}
             onChange={handleChange}
-            className="w-full border px-4 py-2 rounded h-[45px] overflow-y-auto"
+            className="w-full border px-4 py-2 rounded h-[45px]"
             required
             style={{ maxHeight: "160px", overflowY: "auto" }}
           >
