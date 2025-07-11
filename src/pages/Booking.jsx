@@ -16,7 +16,7 @@ function Booking() {
   const fetchUserBookings = async () => {
     if (isLoggedIn && user?.id) {
       try {
-        const allBookings = await getAllBookings(); // ✅ SUDAH DIBENARKAN
+        const allBookings = await getAllBookings(); 
         const filteredBookings = allBookings.filter(
           booking => booking.userId === user.id
         );
